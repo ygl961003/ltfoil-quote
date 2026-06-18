@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上海澧泰 - 销售报价系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Microsoft YaHei","PingFang SC",sans-serif; background: #f0f2f5; color: #333; }
+.header { background: linear-gradient(135deg,#7a1212,#a31e1e); color: white; padding: 20px 30px; }
+.header h1 { font-size: 22px; }
+.container { max-width: 1300px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+@media (max-width:960px) { .container { grid-template-columns: 1fr; } }
+.sidebar { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.sidebar h2 { font-size: 16px; color: #7a1212; border-bottom: 2px solid #7a1212; padding-bottom: 8px; margin-bottom: 15px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #555; }
+.form-group select,.form-group input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
+.form-group select:focus,.form-group input:focus { outline: none; border-color: #7a1212; }
+.main { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.main-tabs { display: flex; border-bottom: 2px solid #eee; }
+.main-tabs button { padding: 12px 24px; border: none; background: none; font-size: 14px; font-weight: bold; color: #999; cursor: pointer; }
+.main-tabs button.active { color: #7a1212; border-bottom: 2px solid #7a1212; margin-bottom: -2px; }
+.tab-content { padding: 20px; display: none; }
+.tab-content.active { display: block; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { background: #7a1212; color: white; padding: 8px; text-align: center; font-size: 12px; }
+.data-table td { padding: 7px; border-bottom: 1px solid #eee; text-align: center; }
+.table-wrap { max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
+.btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-family: inherit; }
+.btn-primary { background: #7a1212; color: white; }
+.btn-primary:hover { background: #a31e1e; }
+.btn-success { background: #28a745; color: white; }
+.btn-row { display: flex; gap: 10px; margin-top: 15px; }
+.quote-summary { background: #fff; border: 2px solid #7a1212; border-radius: 10px; padding: 20px; }
+.quote-summary h3 { color: #7a1212; margin-bottom: 10px; }
+.quote-summary .item { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
+.formula-box { background: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 12px; margin-top: 10px; font-size: 12px; color: #888; line-height: 1.8; }
+.sub-section { background: #f8f9fa; border-radius: 8px; padding: 12px; margin-top: 10px; border: 1px solid #eee; }
+#freightResult { background: #f0f9f0; border: 1px solid #c8e6c9; border-radius: 8px; padding: 10px; margin-top: 6px; }
+
+/* LOGIN */
+#loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg,#7a1212,#a31e1e,#c41e3a); z-index:99999; display:flex; align-items:center; justify-content:center; font-family:"Microsoft YaHei",sans-serif; }
+#loginBox { background:white; border-radius:16px; padding:40px 36px; width:380px; max-width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center; }
+#loginBox .logo { font-size:48px; margin-bottom:10px; }
+#loginBox h2 { font-size:22px; color:#7a1212; margin-bottom:4px; }
+#loginBox p { font-size:13px; color:#999; margin-bottom:24px; }
+#loginBox input { width:100%; padding:12px 16px; border:2px solid #e0e0e0; border-radius:10px; font-size:16px; font-family:inherit; text-align:center; letter-spacing:4px; outline:none; box-sizing:border-box; }
+#loginBox input:focus { border-color:#7a1212; }
+#loginBox .error { color:#d32f2f; font-size:13px; margin-top:10px; display:none; }
+#loginBox button { width:100%; padding:12px; margin-top:16px; background:linear-gradient(135deg,#7a1212,#a31e1e); color:white; border:none; border-radius:10px; font-size:16px; font-weight:bold; cursor:pointer; font-family:inherit; }
+#loginBox .hint { font-size:11px; color:#ccc; margin-top:16px; }
+</style>
+</head>
+<body>
+
+<div id="loginOverlay">
+  <div id="loginBox">
+    <div class="logo">📋</div>
+    <h2>销售报价系统</h2>
+    <p>上海澧泰烫金纸 · 请输入访问密码</p>
+    <input type="password" id="passwordInput" placeholder="请输入密码" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
+    <div class="error" id="loginError">密码错误</div>
+    <button onclick="checkPassword()">进入系统</button>
+    <div class="hint">授权使用，未经许可不得访问</div>
+  </div>
+</div>
+
+<script>
+function checkPassword() {
+  var pwd = document.getElementById('passwordInput').value;
+  if (pwd === 'ltfoil2024') {
+    document.getElementById('loginOverlay').style.display = 'none';
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+  }
+}
+</script>
+
+<div class="header">
+  <h1>上海澧泰 · 销售报价系统</h1>
+  <p>烫金纸 / 胶辊 / 硅胶板 — 含运费自动计算</p>
+</div>
+
+<div class="container">
+  <div class="sidebar">
+    <h2>📋 报价参数</h2>
+
+    <div class="form-group">
+      <label>产品类型</label>
+      <select id="productType" onchange="updateP()">
+        <option value="foil1">开发烫金纸（120米标准卷）</option>
+        <option value="foil2">竞品烫金纸（120米标准卷）</option>
+        <option value="roller">胶辊和硅胶板新制</option>
+        <option value="sheet">硅胶板复制</option>
+      </select>
+    </div>
+
+    <div class="sub-section" id="foilOpts">
+      <div class="form-group">
+        <label>不含税成本价格范围</label>
+        <select id="foilQty" onchange="updMargin()">
+          <option value="0">&lt;200元</option>
+          <option value="1">201-300元</option>
+          <option value="2">301-400元</option>
+          <option value="3">401-500元</option>
+          <option value="4">501-600元</option>
+          <option value="5">601-700元</option>
+          <option value="6">701元以上</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>净利润率</label>
+        <input type="text" id="foilMargin" value="13.0%" style="font-weight:bold;color:#8B0000;" readonly>
+      </div>
+      <div class="form-group">
+        <label>不含税成本价（元）</label>
+        <input type="number" id="foilBaseCost" value="70" step="5">
+      </div>
+    </div>
+
+    <div class="sub-section" id="rollerOpts" style="display:none">
+      <div class="form-group">
+        <label>成本单价 (元)</label>
+        <input type="number" id="rollerCost" value="50" step="0.5">
+      </div>
+      <div class="form-group">
+        <label>利润率</label>
+        <select id="rollerProfit">
+          <option value="0.2">20%</option><option value="0.25">25%</option><option value="0.3">30%</option>
+          <option value="0.35">35%</option><option value="0.4">40%</option><option value="0.5">50%</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>🚚 德邦快递（上海出发）</label>
+      <select id="province" onchange="updFreight()">
+        <option value="">选择省份</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>重量 (kg)</label>
+      <input type="number" id="weight" value="1" min="0.1" step="0.5" oninput="updFreight()">
+    </div>
+    <div id="freightResult"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="calc()">🧮 计算报价</button>
+      <button class="btn btn-success" onclick="printQ()">🖨️ 打印</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-tabs">
+      <button class="active" onclick="swT(event,'quote')">📊 报价结果</button>
+      <button onclick="swT(event,'foil')">📄 烫金纸定价</button>
+      <button onclick="swT(event,'roller')">📄 硅胶定价</button>
+      <button onclick="swT(event,'ship')">🚚 快递价格</button>
+    </div>
+
+    <div id="tab-quote" class="tab-content active">
+      <div id="resultArea"><div style="text-align:center;padding:60px;color:#999;"><p style="font-size:48px;">📊</p><p>选择产品参数，点击计算报价</p></div></div>
+    </div>
+
+    <div id="tab-foil" class="tab-content">
+      <h3 style="color:#8B0000;">烫金纸定价表</h3>
+      <p style="font-size:12px;color:#666;">开发烫金纸</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>价格范围</th><th>利润率</th><th>成本价</th><th>运费</th><th>基准价</th><th>税率</th><th>含税售价</th><th>不含税</th></tr></thead>
+          <tbody id="fb1"></tbody>
+        </table>
+      </div>
+      <p style="font-size:12px;color:#666;margin-top:10px;">竞品烫金纸</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>价格范围</th><th>利润率</th><th>成本价</th><th>运费</th><th>基准价</th><th>税率</th><th>含税售价</th><th>不含税</th></tr></thead>
+          <tbody id="fb2"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-roller" class="tab-content">
+      <h3 style="color:#8B0000;">硅胶产品定价表</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>产品</th><th>成本</th><th>利润率</th><th>基准价</th><th>含税售价</th><th>不含税</th></tr></thead>
+          <tbody id="rb"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-ship" class="tab-content">
+      <h3 style="color:#8B0000;">德邦快递价格表</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>目的地</th><th>首重1kg</th><th>续重/kg</th><th>时效</th></tr></thead>
+          <tbody id="sb"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var fA = [
+  {t:'<200元',u:0.13,c:70,f:10},{t:'201-300元',u:0.12,c:235,f:0},{t:'301-400元',u:0.11,c:350,f:0},
+  {t:'401-500元',u:0.10,c:450,f:0},{t:'501-600元',u:0.09,c:600,f:0},{t:'601-700元',u:0.08,c:650,f:0},{t:'701元以上',u:0.07,c:800,f:0}
+];
+var fB = [
+  {t:'<200元',u:0.07,c:70,f:0},{t:'201-300元',u:0.07,c:250,f:0},{t:'301-400元',u:0.065,c:350,f:0},
+  {t:'401-500元',u:0.05,c:450,f:0},{t:'501-600元',u:0.05,c:550,f:0},{t:'601-700元',u:0.045,c:650,f:0}
+];
+var rD = [{n:'胶辊和硅胶板新制',c:50,p:0.2,f:0},{n:'硅胶板复制',c:35,p:0.4,f:0}];
+var dP = [
+  {d:'上海',f:9,e:1,t:'1-2天'},{d:'江苏',f:10,e:1,t:'1-2天'},{d:'浙江',f:10,e:1,t:'1-2天'},{d:'安徽',f:10,e:1,t:'1-2天'},
+  {d:'北京',f:14,e:3,t:'2-3天'},{d:'天津',f:13,e:3.3,t:'2-3天'},{d:'广东',f:15,e:3.5,t:'2-3天'},{d:'河北',f:14,e:3.3,t:'2-3天'},
+  {d:'湖南',f:13,e:2.6,t:'2-3天'},{d:'湖北',f:13,e:2.6,t:'2-3天'},{d:'河南',f:14,e:2.6,t:'2-3天'},{d:'江西',f:13,e:2.6,t:'2-3天'},
+  {d:'山东',f:13,e:2.6,t:'2-3天'},{d:'山西',f:14,e:2.6,t:'2-3天'},{d:'福建',f:14,e:2.6,t:'2-3天'},{d:'重庆',f:14,e:3.3,t:'2-3天'},
+  {d:'四川',f:16,e:3,t:'3-4天'},{d:'陕西',f:14,e:3,t:'3-4天'},{d:'贵州',f:16,e:3.5,t:'3-4天'},{d:'辽宁',f:15,e:3.5,t:'2-3天'},
+  {d:'吉林',f:15,e:3.5,t:'2-3天'},{d:'甘肃',f:16,e:3.5,t:'3-4天'},{d:'宁夏',f:16,e:3.5,t:'3-4天'},{d:'黑龙江',f:16,e:3.5,t:'3-4天'},
+  {d:'广西',f:19,e:4,t:'3-4天'},{d:'云南',f:16,e:3.5,t:'3-4天'},{d:'内蒙古',f:16,e:3.5,t:'4-5天'},{d:'西藏',f:20,e:3.5,t:'4-5天'},
+  {d:'青海',f:16,e:3.5,t:'4-5天'},{d:'海南省',f:19,e:4,t:'4-5天'},{d:'新疆',f:35,e:11,t:'5-7天'},{d:'内蒙古东部',f:19,e:4,t:'4-5天'}
+];
+
+function updMargin() {
+  var t = document.getElementById('productType').value;
+  if (!t.startsWith('foil')) return;
+  var idx = parseInt(document.getElementById('foilQty').value);
+  var arr = t==='foil1'?fA:fB;
+  if (idx>=arr.length) return;
+  var d = arr[idx];
+  document.getElementById('foilMargin').value = (d.u*100).toFixed(1)+'%';
+  document.getElementById('foilBaseCost').value = d.c;
+}
+
+function updateP() {
+  var t = document.getElementById('productType').value;
+  document.getElementById('foilOpts').style.display = t.startsWith('foil')?'block':'none';
+  document.getElementById('rollerOpts').style.display = (t==='roller'||t==='sheet')?'block':'none';
+  if (t.startsWith('foil')) updMargin();
+  if (t==='roller'){document.getElementById('rollerCost').value=50;document.getElementById('rollerProfit').value='0.2';}
+  else if (t==='sheet'){document.getElementById('rollerCost').value=35;document.getElementById('rollerProfit').value='0.4';}
+}
+
+function updFreight() {
+  var p = document.getElementById('province').value;
+  if (!p) return;
+  var d = dP.find(x=>x.d===p);
+  if (!d) return;
+  var w = parseFloat(document.getElementById('weight').value)||1;
+  var ft = d.f + Math.max(0,(w-1))*d.e;
+  document.getElementById('freightResult').innerHTML = '<b>到'+p+'：'+ft.toFixed(2)+'元</b><br><small>首重'+d.f+'元+续重'+Math.max(0,w-1).toFixed(1)+'kg*'+d.e+'元 时效：'+d.t+'</small>';
+}
+
+function calc() {
+  var t = document.getElementById('productType').value;
+  var p = document.getElementById('province').value;
+  var w = parseFloat(document.getElementById('weight').value)||1;
+  var fD = dP.find(x=>x.d===p);
+  var ft = fD ? fD.f+Math.max(0,(w-1))*fD.e : 0;
+  var ci = fD ? '('+p+' 首重'+fD.f+'元+续重'+Math.max(0,w-1).toFixed(1)+'kg*'+fD.e+'元)' : '';
+  var r = {};
+
+  if (t==='foil1'||t==='foil2') {
+    var idx = parseInt(document.getElementById('foilQty').value);
+    var arr = t==='foil1'?fA:fB;
+    var d = idx<arr.length?arr[idx]:arr[arr.length-1];
+    var bc = parseFloat(document.getElementById('foilBaseCost').value)||d.c;
+    var tc = bc;
+    var tb = tc/(1-d.u)+ft;
+    var ti = tb*1.16;
+    var te = ti/1.1;
+    r = {p:(t==='foil1'?'开发烫金纸':'竞品烫金纸'),det:d.t+' 利润率'+(d.u*100).toFixed(1)+'% 成本'+bc+'元',tot:tc,tb:tb,ti:ti,te:te,ref:'德邦运费：'+ft.toFixed(1)+'元 '+ci};
+  } else {
+    var c = parseFloat(document.getElementById('rollerCost').value)||50;
+    var pr = parseFloat(document.getElementById('rollerProfit').value)||0.2;
+    var tb = c/(1-pr)+ft;
+    var ti = tb*1.16;
+    var te = ti/1.1;
+    r = {p:t==='roller'?'胶辊和硅胶板新制':'硅胶板复制',det:'成本'+c+'元 利润率'+(pr*100)+'%',tot:c+ft,tb:tb,ti:ti,te:te,ref:'运费：'+ft.toFixed(1)+'元 '+ci};
+  }
+  showR(r);
+}
+
+function showR(r) {
+  document.getElementById('resultArea').innerHTML =
+    '<div class="quote-summary"><h3>报价结果</h3>'+
+    '<div class="item"><span>产品：</span><b>'+r.p+'</b></div>'+
+    '<div class="item"><span>规格：</span>'+r.det+'</div><hr>'+
+    '<div class="item"><b>不含税总成本：</b><b>'+r.tot.toFixed(2)+' 元</b></div>'+
+    '<div class="item"><span>不含税基准价：</span>'+r.tb.toFixed(2)+' 元</div>'+
+    '<div class="item"><span>含税售价(x1.16)：</span><b style="color:#8B0000;font-size:18px;">'+r.ti.toFixed(2)+' 元</b></div>'+
+    '<div class="item"><span>不含税售价(/1.1)：</span><b>'+r.te.toFixed(2)+' 元</b></div><hr>'+
+    '<div style="font-size:12px;color:#888;">'+r.ref+'</div><hr>'+
+    '<button class="btn btn-success" onclick="printQ()">打印报价单</button></div>';
+  document.querySelectorAll('.main-tabs button')[0].click();
+}
+
+function printQ() {
+  var h = document.getElementById('resultArea').innerHTML;
+  var w = window.open('','','width=800,height=600');
+  w.document.write('<html><meta charset="UTF-8"><body style="font-family:Microsoft YaHei;padding:40px"><h1 style="color:#8B0000;text-align:center;">上海澧泰烫金纸</h1><p style="text-align:center;">www.ltfoil.com | 叶先生 13122918917</p><hr>'+h+'<hr><p style="text-align:center;color:#999;font-size:12px;">报价有效期15天</p></body></html>');
+  w.document.close();
+}
+
+function swT(e,n) {
+  document.querySelectorAll('.main-tabs button').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});
+  e.target.classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+}
+
+// init
+(function(){
+  var s = document.getElementById('province');
+  dP.forEach(function(d){var o=document.createElement('option');o.value=d.d;o.textContent=d.d;s.appendChild(o);});
+  updMargin();
+  // render tables
+  function rt(tid,data){var tb=document.getElementById(tid);tb.innerHTML='';data.forEach(function(d){var b=d.c/(1-d.u)+d.f;var ti=b*1.16;var te=ti/1.1;tb.innerHTML+='<tr><td>'+d.t+'</td><td>'+(d.u*100).toFixed(1)+'%</td><td>'+d.c+'</td><td>'+d.f.toFixed(1)+'</td><td>'+b.toFixed(2)+'</td><td>1.16</td><td>'+ti.toFixed(2)+'</td><td>'+te.toFixed(2)+'</td></tr>';});}
+  rt('fb1',fA);rt('fb2',fB);
+  var tb2=document.getElementById('rb');tb2.innerHTML='';rD.forEach(function(d){var b=d.c/(1-d.p)+d.f;var ti=b*1.16;var te=ti/1.1;tb2.innerHTML+='<tr><td>'+d.n+'</td><td>'+d.c+'元</td><td>'+(d.p*100)+'%</td><td>'+b.toFixed(2)+'</td><td>'+ti.toFixed(2)+'</td><td>'+te.toFixed(2)+'</td></tr>';});
+  var tb3=document.getElementById('sb');tb3.innerHTML='';dP.forEach(function(d){tb3.innerHTML+='<tr><td><b>'+d.d+'</b></td><td>'+d.f+'元</td><td>'+d.e+'元/kg</td><td>'+d.t+'</td></tr>';});
+})();
+</script>
+</body>
+</html>
