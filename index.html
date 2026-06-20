@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>上海澧泰 - 销售报价系统</title>
+<title>MYCOULD - 销售报价系统</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: "Microsoft YaHei","PingFang SC",sans-serif; background: #f0f2f5; color: #333; }
@@ -58,7 +58,7 @@ body { font-family: "Microsoft YaHei","PingFang SC",sans-serif; background: #f0f
   <div id="loginBox">
     <div class="logo">📋</div>
     <h2>销售报价系统</h2>
-    <p>上海澧泰烫金纸 · 请输入访问密码</p>
+    <p>MYCOULD烫金纸 · 请输入访问密码</p>
     <input type="password" id="passwordInput" placeholder="请输入密码" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
     <div class="error" id="loginError">密码错误</div>
     <button onclick="checkPassword()">进入系统</button>
@@ -80,7 +80,7 @@ function checkPassword() {
 </script>
 
 <div class="header">
-  <h1>上海澧泰 · 销售报价系统</h1>
+  <h1>MYCOULD · 销售报价系统</h1>
   <p>烫金纸 / 胶辊 / 硅胶板 — 含运费自动计算</p>
 </div>
 
@@ -303,7 +303,7 @@ function showR(r) {
 function printQ() {
   var h = document.getElementById('resultArea').innerHTML;
   var w = window.open('','','width=800,height=600');
-  w.document.write('<html><meta charset="UTF-8"><body style="font-family:Microsoft YaHei;padding:40px"><h1 style="color:#8B0000;text-align:center;">上海澧泰烫金纸</h1><p style="text-align:center;">www.ltfoil.com | 叶先生 13122918917</p><hr>'+h+'<hr><p style="text-align:center;color:#999;font-size:12px;">报价有效期15天</p></body></html>');
+  w.document.write('<html><meta charset="UTF-8"><body style="font-family:Microsoft YaHei;padding:40px"><h1 style="color:#8B0000;text-align:center;">MYCOULD烫金纸</h1><p style="text-align:center;">www.ltfoil.com | 叶先生 13122918917</p><hr>'+h+'<hr><p style="text-align:center;color:#999;font-size:12px;">报价有效期15天</p></body></html>');
   w.document.close();
 }
 
